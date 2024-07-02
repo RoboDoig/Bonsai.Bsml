@@ -9,8 +9,10 @@ The BSML consists of:
 
 ### Guarantees
 - All states return Unit
+- All states are defined as observables in the Bonsai workflow
 - Every state transition produces an event `StateTransition (Unit)`
 - Valid streams return a built-in type
+- A Bonsai controller that manages state dictionary, current state, transition process between states
 
 ## What does the Bonsai workflow look like?
 We have a Bonsai workflow called StimulusResponse.bonsai
@@ -56,3 +58,18 @@ stateMachine:
 - {name: StimulusB, transitionTo: {name: TrialStart, withCondition: complete}}
 
 ```
+
+### Writing BSML
+We can import a .foo file with the description of the available states and data streams, along with the output types of the data stream.
+
+We define an initial state for the state machine to start on.
+
+We define the state machine. Each line is a transition definition. Each transition definition includes the current state it applies to, and then a single or array of transitions for each state the current state can transition to. Each transitionTo also includes a condition for the transition. The most simple is `completed` which causes the state to transition when it returns Unit. We can also produce transitions based on available data streams. These transitions in BSML are context-aware of the type. So for example a condition based on data stream with a numeric type can use ==, >=, <=, != etc. A boolean or string condition can only use ==.
+
+N.B. need to think about how probabilistic transitions work. Do they use a probability provider in Bonsai?
+
+A nice extension would be to do combined conditionals across the same or multiple data streams e.g. `StateTimer > 2 && StateTimer < 4`
+
+There could even be some python extensibility to allow for expressions for more complex conditionals.
+
+## What does the compilation tool look like?
