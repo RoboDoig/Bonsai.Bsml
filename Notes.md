@@ -72,4 +72,11 @@ A nice extension would be to do combined conditionals across the same or multipl
 
 There could even be some python extensibility to allow for expressions for more complex conditionals.
 
-## What does the compilation tool look like?
+## How does the compilation tool work?
+
+We already have the states themselves implemented in Bonsai. They are stored in a named dictionary so they can be looked up by the state-machine controller when it's time for a transition. We have a soft guarantee that the BSML description will not transition to a non-existent state because of the .foo file we generated.
+
+What we need to generate is the conditional transitions. For the `complete` condition the state controller doesn't need to do much, it just needs to wait for `Unit` to return and then look up the appropriate transition. For data stream based transition (e.g. `StateTimer > 2`), the controller needs to create a parallel observable that subscribes to the data stream and defines a conditional transition.
+
+## Possible alternate approaches
+Every state is an IncludeWorkflow stored in extensions. The state machine is a single operator (also an extension) that is created via code generation like in sgen.
